@@ -8,7 +8,9 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import path from "path";
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -33,9 +35,6 @@ app.set('views', path.join(__dirname, 'views'));
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
 });
 
 // Database schema setup
