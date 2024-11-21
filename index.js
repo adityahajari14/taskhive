@@ -34,7 +34,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 const db = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: "postgres://neondb_owner:KRWN2jBfA3rq@ep-sparkling-violet-a12g5d5y-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require",
 });
 
 // Database schema setup
