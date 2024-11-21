@@ -32,11 +32,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 const db = new pg.Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "taskhive",
-  password: "123456",
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 // Database schema setup
