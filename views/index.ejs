@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity App</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/frontend_main_signedOut_bgHeroMain.png-tbcYFypFIb128A81pfvjmtXm9C6rmR.webp') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            width: 100vw;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            margin-top: 20px;
+
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        .button {
+            background-color: #ffcc00;
+            color: black;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 10px;
+        }
+        .button:hover {
+            background-color: #e6b800;
+        }
+
+        .index-div{
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 60px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 60vw;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+    </style>
+</head>
+<body>
+    <%- include('header') %>
+    <div class="container">
+        <div class="index-div">
+            <h1>Welcome to Your Productivity App</h1>
+        <% if (user) { %>
+            <p>Hello, Choose a tool to get started.</p>
+            <div>
+                <a href="/focus-timer" class="button">Focus Timer</a>
+                <a href="/habit-tracker" class="button">Habit Tracker</a>
+                <a href="/todo-list" class="button">To-Do List</a>
+                <a href="/logout" class="button">Logout</a>
+            </div>
+        <% } else { %>
+            <p>Level up your learning and earning potential. Join our community and boost your productivity.</p>
+            <div>
+                <a href="/login" class="button">Login</a>
+                <a href="/register" class="button">Register</a>
+            </div>
+        <% } %>
+        </div>
+    </div>
+    
+</body>
+</html>

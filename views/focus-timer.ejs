@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Timer</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/frontend_main_signedOut_bgHeroMain.png-tbcYFypFIb128A81pfvjmtXm9C6rmR.webp') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+        .leave-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .leave-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .timer-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .focus-div{
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 5vh 20vw;
+            border-radius: 30px;
+        }
+
+        .objective-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            width: 80%;
+            max-width: 400px;
+            transition: background-color 0.3s ease;
+        }
+        .objective-input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .mode-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .mode-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1rem;
+        }
+        .mode-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .mode-button.active {
+            background-color: rgba(255, 255, 255, 0.4);
+            font-weight: bold;
+        }
+        .timer {
+            font-size: 8rem;
+            margin-bottom: 30px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .start-button {
+            background-color: #ffcc00;
+            color: black;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        .start-button:hover {
+            background-color: #e6b800;
+        }
+        .sessions-list {
+            margin-top: 40px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+        }
+        .sessions-list h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .sessions-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .sessions-list li {
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .finish-button {
+    background-color: #e60000;
+    color: white;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.finish-button:hover {
+    background-color: #cc0000;
+}
+
+::placeholder{
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <%- include('header') %>
+    <header class="header">
+        <a href="/" class="leave-button">← Leave this room</a>
+    </header>
+    <div class="timer-container">
+        <div class="focus-div">
+            <div class="mode-buttons">
+                <button class="mode-button active" data-time="25">Focus</button>
+                <button class="mode-button" data-time="5">Short Break</button>
+                <button class="mode-button" data-time="15">Long Break</button>
+            </div>
+            <div class="timer" id="timer">25:00</div>
+            <div class="action-buttons">
+                <button class="start-button" id="startButton">Start</button>
+                <button class="finish-button" id="finishButton" style="display: none;">Finish</button>
+            </div>
+        </div>
+    </div>
+
+    
+    
+    <script>
+        const timer = document.getElementById('timer');
+        const startButton = document.getElementById('startButton');
+        const modeButtons = document.querySelectorAll('.mode-button');
+        const objectiveInput = document.getElementById('objectiveInput');
+        const sessionsList = document.getElementById('sessionsList');
+
+        let countdown;
+        let timeLeft;
+        let isRunning = false;
+        let currentMode = 'Focus';
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (isRunning) {
+                clearInterval(countdown);
+                startButton.textContent = 'Start';
+                isRunning = false;
+            } else {
+                countdown = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimer();
+                    } else {
+                        clearInterval(countdown);
+                        isRunning = false;
+                        startButton.textContent = 'Start';
+                        saveSession();
+                    }
+                }, 1000);
+                startButton.textContent = 'Pause';
+                isRunning = true;
+            }
+        }
+
+        function setMode(mode, duration) {
+            currentMode = mode;
+            timeLeft = duration * 60;
+            updateTimer();
+            clearInterval(countdown);
+            isRunning = false;
+            startButton.textContent = 'Start';
+        }
+
+        function saveSession() {
+            const objective = objectiveInput.value.trim();
+            const duration = modeButtons.find(btn => btn.classList.contains('active')).dataset.time;
+            
+            fetch('/focus-timer/sessions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ type: currentMode, duration, objective }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const li = document.createElement('li');
+                li.textContent = `${data.type} - ${data.duration} minutes (${new Date(data.created_at).toLocaleString()})`;
+                sessionsList.prepend(li);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        startButton.addEventListener('click', startTimer);
+
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                setMode(button.textContent, parseInt(button.dataset.time));
+            });
+        });
+
+        
+
+        // Initialize timer
+        setMode('Focus', 25);
+
+        const finishButton = document.getElementById('finishButton');
+
+// Function to handle finishing the session
+function finishSession() {
+    clearInterval(countdown);
+    isRunning = false;
+    startButton.textContent = 'Start';
+    finishButton.style.display = 'none';
+    saveSession(true); // Save session and reset
+    document.querySelector(".timer").innerHTML("25:00")
+}
+
+// Update saveSession to handle completion
+function saveSession(isFinished = false) {
+    const objective = objectiveInput?.value?.trim() || ''; // Safely access objective input
+    const activeButton = [...modeButtons].find(btn => btn.classList.contains('active'));
+    const defaultDuration = activeButton ? parseInt(activeButton.dataset.time) : 25;
+    const duration = isFinished ? Math.floor(timeLeft / 60) : defaultDuration; // Use `timeLeft` if session is finished
+
+    fetch('/focus-timer/sessions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            type: currentMode, // Current session type
+            duration, // Remaining or full duration
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        const li = document.createElement('li');
+        li.textContent = `${data.type} - ${data.duration} minutes (${new Date(data.created_at).toLocaleString()})`;
+        sessionsList.prepend(li);
+
+        // Reset if finished
+        if (isFinished) {
+            setMode('Focus', 25); // Default back to Focus
+            objectiveInput.value = ''; // Clear input
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+// Show Finish button when the timer starts
+startButton.addEventListener('click', () => {
+    if (!isRunning) {
+        finishButton.style.display = 'inline-block';
+    } else {
+        finishButton.style.display = 'none';
+    }
+});
+
+// Add event listener for Finish button
+finishButton.addEventListener('click', finishSession);
+
+    </script>
+</body>
+</html>

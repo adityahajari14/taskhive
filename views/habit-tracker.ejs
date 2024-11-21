@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/frontend_main_signedOut_bgHeroMain.png-tbcYFypFIb128A81pfvjmtXm9C6rmR.webp') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+        .leave-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .leave-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .habit-div{
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 5vh 20vw;
+            border-radius: 30px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .habit-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .habit-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+        .add-habit-btn {
+            background-color: #ffcc00;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        .add-habit-btn:hover {
+            background-color: #e6b800;
+        }
+        .habits-list {
+            width: 100%;
+            max-width: 600px;
+        }
+        .habit-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .habit-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .habit-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+        }
+        .habit-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+        }
+        .habit-name {
+            font-size: 1.2rem;
+        }
+        .habit-streak {
+            font-size: 0.9rem;
+            color: #ffcc00;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        ::placeholder{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <%- include('header') %>
+    <header class="header">
+        <a href="/" class="leave-button">← Leave this room</a>
+    </header>
+    <main class="main-content">
+        <div class="habit-div">
+            <h1>Habit Tracker</h1>
+        <form class="habit-form" action="/habit-tracker/habits" method="POST">
+            <input type="text" name="name" class="habit-input" placeholder="Enter a new habit" required>
+            <button type="submit" class="add-habit-btn">Add Habit</button>
+        </form>
+        <div class="habits-list">
+            <% habits.forEach(habit => { %>
+                <div class="habit-item">
+                    <div class="habit-info">
+                        <input type="checkbox" class="habit-checkbox"
+                               <%= habit.completed ? 'checked' : '' %>
+                               onchange="toggleHabit(<%= habit.id %>)">
+                        <div>
+                            <div class="habit-name"><%= habit.name %></div>
+                            <div class="habit-streak">🔥 <%= habit.streak || 0 %> day streak</div>
+                        </div>
+                    </div>
+                    <button onclick="deleteHabit(<%= habit.id %>)" class="delete-btn">✕</button>
+                </div>
+            <% }); %>
+        </div>
+        </div>
+    </main>
+    
+    <script>
+        function toggleHabit(id) {
+            fetch(`/habit-tracker/habits/${id}/toggle`, { method: 'POST' })
+                .then(() => window.location.reload());
+        }
+
+        function deleteHabit(id) {
+            if (confirm('Are you sure you want to delete this habit?')) {
+                fetch(`/habit-tracker/habits/${id}/delete`, { method: 'POST' })
+                    .then(() => window.location.reload());
+            }
+        }
+    </script>
+</body>
+</html>
